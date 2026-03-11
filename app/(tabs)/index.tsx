@@ -5,76 +5,72 @@ import {
     StyleSheet,
     Text,
     TextInput,
+    TouchableOpacity,
     View,
 } from "react-native";
 
-import { coverPage, getChapter } from "../../data/biblepages";
+import { coverPage } from "../../data/biblepages";
+
+const books = [
+  { name: "Gênesis", id: "GEN" },
+  { name: "Êxodo", id: "EXO" },
+  { name: "Levítico", id: "LEV" },
+  { name: "Números", id: "NUM" },
+  { name: "Deuteronômio", id: "DEU" },
+  { name: "Josué", id: "JOS" },
+  { name: "Juízes", id: "JDG" },
+  { name: "Rute", id: "RUT" },
+  { name: "1 Samuel", id: "1SA" },
+  { name: "2 Samuel", id: "2SA" },
+  { name: "Salmos", id: "PSA" },
+  { name: "Provérbios", id: "PRO" },
+  { name: "Isaías", id: "ISA" },
+  { name: "Jeremias", id: "JER" },
+
+  { name: "Mateus", id: "MAT" },
+  { name: "Marcos", id: "MRK" },
+  { name: "Lucas", id: "LUK" },
+  { name: "João", id: "JHN" },
+  { name: "Atos", id: "ACT" },
+  { name: "Romanos", id: "ROM" },
+  { name: "1 Coríntios", id: "1CO" },
+  { name: "2 Coríntios", id: "2CO" },
+  { name: "Gálatas", id: "GAL" },
+  { name: "Efésios", id: "EPH" },
+  { name: "Filipenses", id: "PHP" },
+  { name: "Colossenses", id: "COL" },
+  { name: "Apocalipse", id: "REV" },
+];
 
 export default function HomeScreen() {
-
   const [search, setSearch] = useState("");
-  const [verses, setVerses] = useState<string[]>([]);
-  const [reference, setReference] = useState("");
   const [motivational, setMotivational] = useState<string[]>([]);
 
   useEffect(() => {
-    loadChapter();
-    loadMotivational();
+    randomVerses();
   }, []);
 
-  async function loadChapter() {
-
-    const chapter = await getChapter(
-      "de4e12af7f28f599-01",
-      "JHN.3"
-    );
-
-    const text = chapter.text ?? "";
-
-    setReference(chapter.title ?? "");
-
-    const splitVerses = text
-      .split(/(?=\d+\s)/)
-      .map(v => v.trim())
-      .filter(v => v.length > 0);
-
-    setVerses(splitVerses);
-  }
-
-  function loadMotivational() {
-
-    const frases = [
-
-      "Tudo posso naquele que me fortalece. Filipenses 4:13",
-
+  function randomVerses() {
+    const verses = [
       "O Senhor é o meu pastor; nada me faltará. Salmos 23:1",
-
+      "Tudo posso naquele que me fortalece. Filipenses 4:13",
+      "Entrega o teu caminho ao Senhor; confia nele. Salmos 37:5",
+      "Porque Deus amou o mundo de tal maneira. João 3:16",
       "Confia no Senhor de todo o teu coração. Provérbios 3:5",
-
-      "Porque Deus amou o mundo de tal maneira que deu o seu Filho. João 3:16",
-
-      "Entrega o teu caminho ao Senhor. Salmos 37:5",
-
+      "Buscai primeiro o Reino de Deus. Mateus 6:33",
       "O choro pode durar uma noite, mas a alegria vem pela manhã. Salmos 30:5",
-
-      "Buscai primeiro o Reino de Deus. Mateus 6:33"
-
     ];
 
-    const random = frases.sort(() => 0.5 - Math.random()).slice(0, 3);
-
-    setMotivational(random);
+    const shuffled = verses.sort(() => 0.5 - Math.random());
+    setMotivational(shuffled.slice(0, 3));
   }
 
-  const filteredVerses = verses.filter((v) =>
-    v.toLowerCase().includes(search.toLowerCase())
+  const filteredBooks = books.filter((book) =>
+    book.name.toLowerCase().includes(search.toLowerCase())
   );
-
-  const versesToShow = search ? filteredVerses : verses;
 
   return (
     <ScrollView style={styles.container}>
-
       {/* CAPA */}
 
       {coverPage.image && (
@@ -87,53 +83,35 @@ export default function HomeScreen() {
 
       <TextInput
         style={styles.search}
-        placeholder="Digite uma palavra (ex: Jesus)"
+        placeholder="Pesquisar livro (ex: João)"
         value={search}
         onChangeText={setSearch}
       />
 
-      {/* FRASES MOTIVACIONAIS */}
+      {/* FRASES ALEATÓRIAS */}
 
-      <Text style={styles.title}>Frases da Bíblia</Text>
+      <Text style={styles.title}>Versículos para você</Text>
 
-      {motivational.map((frase, index) => (
-
-        <View key={index} style={styles.motivationalCard}>
-
-          <Text style={styles.motivationalText}>
-            {frase}
-          </Text>
-
+      {motivational.map((verse, index) => (
+        <View key={index} style={styles.verseCard}>
+          <Text style={styles.verseText}>{verse}</Text>
         </View>
-
       ))}
 
-      {/* CAPÍTULO */}
+      {/* LIVROS */}
 
-      <Text style={styles.title}>
-        {reference}
-      </Text>
+      <Text style={styles.title}>Livros da Bíblia</Text>
 
-      {/* VERSÍCULOS */}
-
-      {versesToShow.map((verse, index) => (
-
-        <View key={index} style={styles.card}>
-
-          <Text style={styles.text}>
-            {verse}
-          </Text>
-
-        </View>
-
+      {filteredBooks.map((book, index) => (
+        <TouchableOpacity key={index} style={styles.bookCard}>
+          <Text style={styles.bookText}>{book.name}</Text>
+        </TouchableOpacity>
       ))}
-
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
@@ -161,28 +139,26 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
-  motivationalCard: {
+  verseCard: {
     backgroundColor: "#e8f5e9",
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
   },
 
-  motivationalText: {
+  verseText: {
     fontSize: 16,
     fontStyle: "italic",
   },
 
-  card: {
+  bookCard: {
     backgroundColor: "#f3f3f3",
     padding: 15,
     borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: 8,
   },
 
-  text: {
-    fontSize: 16,
-    lineHeight: 24,
+  bookText: {
+    fontSize: 18,
   },
-
 });
