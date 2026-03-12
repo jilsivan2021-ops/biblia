@@ -6,7 +6,9 @@ export interface BiblePage {
 }
 
 const API_KEY = "lP371jN_TLA-zpsmZyVXP";
-const BASE_URL = "https://rest.api.bible/v1";
+
+/* proxy para evitar CORS */
+const BASE_URL = "https://corsproxy.io/?https://rest.api.bible/v1";
 
 export const coverPage: BiblePage = {
   type: "cover",
@@ -23,16 +25,16 @@ export async function getChapter(
   chapterId: string
 ): Promise<BiblePage> {
 
-  const response = await fetch(
+  const res = await fetch(
     `${BASE_URL}/bibles/${bibleId}/chapters/${chapterId}`,
     {
       headers: {
-        "api-key": API_KEY,
-      },
+        "api-key": API_KEY
+      }
     }
   );
 
-  const json = await response.json();
+  const json = await res.json();
 
   const cleanText = json.data.content
     .replace(/<[^>]*>?/gm, "")
@@ -42,6 +44,6 @@ export async function getChapter(
   return {
     type: "chapter",
     title: json.data.reference,
-    text: cleanText,
+    text: cleanText
   };
 }

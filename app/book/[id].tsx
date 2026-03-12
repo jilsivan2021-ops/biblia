@@ -45,7 +45,7 @@ data={chapters}
 keyExtractor={(item)=>item.id}
 renderItem={({item})=>(
 <TouchableOpacity
-onPress={()=>router.push(`./chapter/${item.id}`)}
+onPress={()=>router.push(`/chapter/${item.id}`)}
 style={{padding:15}}
 >
 
